@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "27594214933",
+    "project_id": "falconi-location-pov",
+    "storage_bucket": "falconi-location-pov.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:27594214933:android:020bf3e261877a09b1481c",
+        "android_client_info": {
+          "package_name": "com.example.flaconilocationpov"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvYyOHw91Z3b1WPUXtw80OKwE8Gg4bEoQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

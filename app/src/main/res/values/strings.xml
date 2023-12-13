@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Flaconi Location POV</string>
+    <string name="default_notification_channel_id">pov notification</string>
+</resources>
