@@ -168,11 +168,11 @@ class LocationService : Service() {
 
 
     private fun initBluetoothScanBroadcastReceiver() {
-        val storedBeaconAddress = getStoredBeaconAddress()
         val scanCallback = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, scanResult: ScanResult) {
                 val bluetoothDevice = scanResult.device
                 bluetoothDevice?.let { device ->
+                    val storedBeaconAddress = getStoredBeaconAddress()
                     val discoveredDevice = device.address.replace(":","")
                     Log.d(TAG,"stored mac $storedBeaconAddress  $discoveredDevice  ${scanResult.rssi}")
                     if (storedBeaconAddress == discoveredDevice) {

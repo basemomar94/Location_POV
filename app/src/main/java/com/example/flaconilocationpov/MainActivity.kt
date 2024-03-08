@@ -13,11 +13,13 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private var currentBeaconAddress: String? = null
+    private val TAG = this::class.java.simpleName
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, intent: Intent?) {
@@ -46,11 +48,20 @@ class MainActivity : AppCompatActivity() {
         binding.confirmHome.setOnClickListener {
             storeBeaconAddress(binding.home.text.toString())
             binding.current.text = ""
+            updateAddress(true)
         }
+        updateAddress()
+
+
+    }
+
+    private fun updateAddress(isDisplayToast: Boolean = false) {
         getStoredBeaconAddress()?.let { address ->
             binding.home.setText(address)
+            if (isDisplayToast) {
+                Toast.makeText(this, "saved $address", Toast.LENGTH_SHORT).show()
+            }
         }
-
     }
 
     override fun onRequestPermissionsResult(
@@ -63,27 +74,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun permissionCheck() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_SCAN
-            ) != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_CONNECT
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH
-            ) != PackageManager.PERMISSION_GRANTED
+        Log.d(TAG, "permissionCheck")
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED ||
+             ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED
         ) {
             requestPerms()
 
@@ -94,6 +91,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestPerms() {
+        Log.d(TAG, "requesting permission")
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(
@@ -112,6 +110,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createNotificationChannel() {
+        Log.d(TAG, "createNotificationChannel")
         val importance = NotificationManager.IMPORTANCE_DEFAULT
         val channel = NotificationChannel(
             getString(R.string.default_notification_channel_id),
