@@ -6,7 +6,7 @@ object AppConstants {
     const val DISTANCE_BROADCAST = "distance broadcast"
     const val LOCATION_BROADCAST = "location broadcast"
     const val DISTANCE = "distance"
-    const val Location = "location"
+    const val BEACON_ADDRESS = "beacon_address"
     const val PREF_USER_PREFERENCES = "Location POV Falconi"
     const val SAVED_LAT = "saved_lat"
     const val SAVED_LOG = "saved_log"

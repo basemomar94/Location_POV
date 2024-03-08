@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.location.Location
 import android.util.Log
 import com.example.flaconilocationpov.databinding.ActivityMainBinding
 import android.Manifest
@@ -15,11 +14,10 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
-    private var currentLocation: Location? = null
+    private var currentBeaconAddress: String? = null
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, intent: Intent?) {
@@ -27,20 +25,10 @@ class MainActivity : AppCompatActivity() {
 
             val distance = intent?.getIntExtra(AppConstants.DISTANCE, -1)
             Log.d("broadcastReceiver", "distance is $distance")
-            if (distance != null) {
-                binding.text.text = "you are $distance away"
-                getStoredLocation()?.let { location ->
-                    binding.home.text = "home is ${location.latitude}   ${location.longitude}"
+            binding.text.text = distance.toString()
 
-                }
-
-                binding.result.text = if (distance < 50) "You are home" else "You are away"
-
-
-            }
-            currentLocation = intent?.getParcelableExtra(AppConstants.Location)
-            binding.current.text =
-                "current location is ${currentLocation?.latitude}  ${currentLocation?.longitude}"
+            currentBeaconAddress = intent?.getStringExtra(AppConstants.BEACON_ADDRESS)
+            binding.current.text = "$currentBeaconAddress is detected"
         }
 
     }
@@ -56,9 +44,13 @@ class MainActivity : AppCompatActivity() {
         }
         registerReceiver(broadcastReceiver, intentFilter)
         binding.confirmHome.setOnClickListener {
-            currentLocation?.let { it1 -> storeLocation(it1) }
-            //    throw RuntimeException("Test Crash") // Force a crash
+            storeBeaconAddress(binding.home.text.toString())
+            binding.current.text = ""
         }
+        getStoredBeaconAddress()?.let { address ->
+            binding.home.setText(address)
+        }
+
     }
 
     override fun onRequestPermissionsResult(
@@ -81,6 +73,17 @@ class MainActivity : AppCompatActivity() {
                 this,
                 Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_SCAN
+            ) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_CONNECT
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
             requestPerms()
 
@@ -98,7 +101,10 @@ class MainActivity : AppCompatActivity() {
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.POST_NOTIFICATIONS
+                    Manifest.permission.POST_NOTIFICATIONS,
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH
                 ),
                 100
             )
